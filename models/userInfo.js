@@ -1,3 +1,7 @@
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+
 const userInfoSchema = new Schema({
     avatar: {type: String, default: 'default.jpg'},
     registered_time: String,
@@ -7,4 +11,6 @@ const userInfoSchema = new Schema({
     moblie: {type: Number, default: ''},
 })
 
-module.exports = mongoose.model('UserInfo', userInfoSchema);
+const UserInfo = mongoose.model('UserInfo', userInfoSchema);
+
+export default UserInfo
