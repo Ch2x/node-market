@@ -71,7 +71,7 @@ class User extends BaseComponent {
     async login(req, res, next) {
         const form = new formidable.IncomingForm();
         form.parse(req, async(err, fields, files) => {
-            const { userName, password, confirmPassword } = fields;
+            const { userName, password } = fields;
             try{
                 if(!userName) {
                     throw new Error('用户名参数错误');
@@ -116,6 +116,14 @@ class User extends BaseComponent {
 					message: '登陆失败',
 				})
             }
+        })
+    }
+
+    async logout() {
+        delete req.session.user_id;
+        res.send({
+            status: 1,
+            message: '退出成功',
         })
     }
 
