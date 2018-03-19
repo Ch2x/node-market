@@ -8,9 +8,10 @@ import crypto from 'crypto'
 class User extends BaseComponent {
     constructor() {
         super()
-        this.encryption = this.encryption.bind(this)
-        this.registered = this.registered.bind(this)
-        this.login = this.login.bind(this)
+        this.encryption = this.encryption.bind(this);
+        this.registered = this.registered.bind(this);
+        this.login = this.login.bind(this);
+        this.updateAvatar = this.updateAvatar.bind(this);
     }
     async registered(req, res, next) {
         const form = new formidable.IncomingForm();
@@ -125,6 +126,32 @@ class User extends BaseComponent {
             status: 1,
             message: '退出成功',
         })
+    }
+
+    async updateAvatar(req, res, next) {
+        const user_id = req.session.user_id;
+        if(!user_id) {
+            res.send({
+                status: 0,
+                type: 'ERROR_USERID',
+                message: 'user_id参数错误',
+            })
+            return
+        }
+        try {
+            const image_path = await this.getPath(req);
+            await UserInfoModel.findOneAndUpdate({user_id}, {$set: {avatar: image_path}});
+            res.send({
+                status: 1,
+                image_path,
+            })
+        }catch(err) {
+            res.send({
+                status: 0,
+                type: 'ERROR_UPLOAD_IMG',
+                message: '上传图片失败'
+            })
+        }
     }
 
     encryption(password){

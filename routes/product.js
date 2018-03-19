@@ -8,5 +8,7 @@ router.get('/getProducts', Product.getProducts);
 router.get('/getAllProducts', Product.getAllProducts);
 router.get('/getDetail', Product.getDetail);
 router.get('/searchProduct', Product.searchProduct);
+router.delete('/delProduct/:user_id/:product_id', Product.delProduct);
+router.post('/updateProduct/:product_id', Product.updateProduct);
 
 export default router;

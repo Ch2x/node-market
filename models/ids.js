@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const idsSchema = new Schema({
 	user_id: Number,
 	product_id: Number,
+	img_id: Number,
 });
 
 const Ids = mongoose.model('Ids', idsSchema);
@@ -15,6 +16,7 @@ Ids.findOne((err, data) => {
 		const newIds = new Ids({
 			product_id: 0,
 			user_id: 0,
+			number: 0,
 		});
 		newIds.save();
 	}
