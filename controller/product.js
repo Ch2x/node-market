@@ -2,6 +2,7 @@ import BaseComponent from '../prototype/baseComponent'
 import formidable from 'formidable'
 import ProductModel from '../models/product'
 import UserInfoModel from '../models/userInfo'
+import CommentModel from '../models/comment'
 import dtime from 'time-formater'
 import crypto from 'crypto'
 import fs from 'fs'
@@ -128,17 +129,31 @@ class Product extends BaseComponent {
         }
         try{
             const product = await ProductModel.findOne({product_id});
+            let comment = await CommentModel.find({product_id});
+            comment = await Promise.all(comment.map(async function(item){
+                    const from_name = await UserInfoModel.findOne({user_id: item.from_uid}).select('userName');
+                    const to_name = await UserInfoModel.findOne({user_id: item.to_uid}).select('userName');
+                    return { 
+                        content: item.content,
+                        from_uid: item.from_uid,
+                        from_name: from_name.userName,
+                        to_uid: item.to_uid,
+                        to_name: to_name?to_name.userName:undefined,
+                    };
+                })
+            );
             const user_id = product.user_id;
             const userInfo = await UserInfoModel.findOne({user_id});
             res.send({
                 product,
                 userInfo,
+                comment,
             });
         }catch(err) {
             res.json({
                 status: 0,
                 type: 'FAIL_GET',
-                message: '获取失败',
+                message: err,
             })
         }
     }
