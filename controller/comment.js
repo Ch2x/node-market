@@ -1,6 +1,8 @@
 import BaseComponent from '../prototype/baseComponent'
 import formidable from 'formidable'
 import CommentModel from '../models/comment'
+import UserInfoModel from '../models/userInfo'
+import ProductModel from '../models/product'
 import product from './product'
 import dtime from 'time-formater'
 
@@ -37,7 +39,8 @@ class Comment extends BaseComponent {
             }
             try {
                 const comment_id = await this.getId('comment_id');
-                const newComment = { product_id, content, from_uid, to_uid, comment_id };
+                const commentTime = dtime().format('YYYY-MM-DD HH:mm');
+                const newComment = { product_id, content, from_uid, to_uid, comment_id, commentTime };
                 await CommentModel.create(newComment);
                 res.send({
                     status: 1,
@@ -53,6 +56,56 @@ class Comment extends BaseComponent {
                 });
             }
         })
+    }
+
+    async getMyMessage(req, res, next) {
+        const user_id = req.session.user_id;
+        try{
+            if(!user_id) {
+                throw new Error('缺少用户参数');
+            }
+        }catch(err) {
+            res.json({
+                status: 0,
+                type: 'FAIL_GET',
+                message: err.message,
+            })
+            return;
+        }
+        try{
+            let comment = await CommentModel.find({to_uid: user_id});
+            comment = await Promise.all(comment.map(async function(item) {
+                const userInfo = await UserInfoModel.findOne({user_id: item.from_uid}).select('avatar userName');
+                const productInfo = await ProductModel.findOne({product_id: item.product_id}).select('images');
+                if(productInfo === null) {
+                    console.log(1);
+                    return {
+                        userName: userInfo.userName,
+                        avatar: userInfo.avatar,
+                        content: item.content,
+                        product_id: item.product_id,
+                        commentTime: item.commentTime,
+                        isDelete: true,
+                    }
+                } else {
+                    return {
+                        userName: userInfo.userName,
+                        avatar: userInfo.avatar,
+                        content: item.content,
+                        product_id: item.product_id,
+                        commentTime: item.commentTime,
+                        image: productInfo.images[0],
+                    }
+                }
+            }))
+            res.send(comment);
+        }catch(err) {
+            res.json({
+                status: 0,
+                type: 'FAIL_GET',
+                message: err.message,
+            })
+        }
     }
 }
 

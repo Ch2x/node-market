@@ -8,6 +8,7 @@ const commentSchema = new Schema({
     content: String,
     from_uid: Number,
     to_uid: Number,
+    commentTime: String,
 })
 
 const Comment = mongoose.model('Comment', commentSchema);
