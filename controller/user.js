@@ -120,7 +120,7 @@ class User extends BaseComponent {
         })
     }
 
-    async logout() {
+    async logout(req, res, next) {
         delete req.session.user_id;
         res.send({
             status: 1,

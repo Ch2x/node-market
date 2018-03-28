@@ -69,7 +69,7 @@ class Product extends BaseComponent {
     }
 
     async getProducts(req, res, next) {
-        const user_id = req.session.user_id;
+        const user_id = req.query.user_id;
         try{
             if(!user_id) {
                 throw new Error('缺少用户参数');

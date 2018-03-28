@@ -6,7 +6,7 @@ import gm from 'gm'
 
 export default class BaseComponent {
     constructor() {
-        this.idList = ['user_id', 'product_id', 'img_id', 'comment_id'];
+        this.idList = ['user_id', 'product_id', 'img_id', 'comment_id', 'cart_id'];
     }
 
     async getId(type) {
