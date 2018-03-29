@@ -43,8 +43,68 @@ class Cart extends BaseComponent {
         })
     }
 
-    async delShop(req, res, next) {
-    
+    async delShopCart(req, res, next) {
+        let { products, user_id } = req.params;
+        products = products.split(',')
+        if( !products || !user_id) {
+            res.send({
+                type: 'ERROR_QUERY',
+                message: '参数错误',
+            })
+            return
+        }
+        try {
+            await CartModel.remove({cart_id: {$in: products}});
+            res.send({
+                status: 1,
+                success: '删除成功'
+            })
+        }catch(err) {
+            res.send({
+                status: 0,
+                type: 'ERROR_DELETE',
+                message: err.message,
+            })
+        }
+    }
+
+    async getMyCart(req, res, next) {
+        const { user_id } = req.query;
+        try{
+            if(!user_id) {
+                throw new Error('缺少用户参数');
+            }
+        }catch(err) {
+            res.json({
+                status: 0,
+                type: 'FAIL_GET',
+                message: err.message,
+            })
+            return;
+        }
+        try{
+            let product = await CartModel.find({user_id})
+            product = await Promise.all(product.map(async function(item) {
+                const result = await ProductModel.findOne({product_id: item.product_id});
+                const user = await UserInfoModel.findOne({user_id: result.user_id}).select('userName');
+                return {
+                    price: result.price,
+                    title: result.title,
+                    product_id: item.product_id,
+                    images: result.images[0],
+                    owner: user.userName,
+                    owner_id: result.user_id,
+                    cart_id: item.cart_id,
+                }
+            }))
+            res.send(product)
+        }catch(err) {
+            res.json({
+                status: 0,
+                type: 'FAIL_GET',
+                message: '获取失败',
+            })
+        }
     }
 
     async getAddState(req, res, next) {
