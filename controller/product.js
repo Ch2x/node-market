@@ -7,6 +7,7 @@ import dtime from 'time-formater'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
+import AddressModel from '../models/address';
 
 class Product extends BaseComponent {
     constructor() {
@@ -98,9 +99,12 @@ class Product extends BaseComponent {
         const { sort } = req.query;
         console.log(sort);
         try{
-            var filter = {};
+            var filter = { isBuy: false};
             if(sort) {
-                filter = { sort };
+                filter = { 
+                    sort,
+                    isBuy: false, 
+                };
             }
             const products = await ProductModel.find(filter);
             res.send(products);
@@ -255,6 +259,31 @@ class Product extends BaseComponent {
                 })
             }
         })
+    }
+
+    async getOrderInfo(req, res, next) {
+        const { user_id, product_id } = req.query;
+        if(!user_id || !product_id) {
+            res.send({
+                type: 'ERROR_QUERY',
+                message: '参数错误',
+            })
+            return
+        }
+        try {
+            const address = await AddressModel.findOne({user_id});
+            const product = await ProductModel.findOne({product_id});
+            res.send({
+                address,
+                product,
+            })
+        }catch(err) {
+            res.send({
+                status: 0,
+                ttype: 'ERROR_GET',
+                message: err.message,
+            })
+        }
     }
 }
 

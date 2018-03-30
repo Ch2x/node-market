@@ -7,6 +7,7 @@ import configFile from 'config-lite'
 import router from './routes/index'
 import pkg from './package'
 import db from './mongodb/db.js'
+import bodyParser from 'body-parser'
 
 const config = configFile(__dirname)
 const app = express()
@@ -31,6 +32,9 @@ app.all('*', (req, res, next) => {
 	    next();
 	}
 });
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // session 中间件
 const MongoStore = connectMongo(session)

@@ -11,6 +11,7 @@ const productSchema = new Schema({
     sort: String,
     images: [],
     releaseTime: String,
+    isBuy: {type: Boolean, default: false},
 });
 
 const Product = mongoose.model('Product', productSchema);
