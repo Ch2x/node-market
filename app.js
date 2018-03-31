@@ -33,8 +33,8 @@ app.all('*', (req, res, next) => {
 	}
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 // session 中间件
 const MongoStore = connectMongo(session)
@@ -57,6 +57,6 @@ app.use(flash())
 router(app)
 
 // 监听端口，启动程序
-app.listen(config.port, '192.168.1.167', function () {
+app.listen(config.port, function () {
   console.log(`${pkg.name} listening on port ${config.port}`)
 })
