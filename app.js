@@ -3,13 +3,14 @@ import express from 'express'
 import session  from 'express-session'
 import connectMongo from 'connect-mongo'
 import flash from 'connect-flash'
-import configFile from 'config-lite'
+// import configFile from 'config-lite'
 import router from './routes/index'
 import pkg from './package'
 import db from './mongodb/db.js'
 
 
-const config = configFile(__dirname)
+// const config = configFile(__dirname)
+const config = require('./config/default.js')
 const app = express()
 
 // 设置模板目录
