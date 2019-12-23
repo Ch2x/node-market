@@ -8,10 +8,11 @@ const productSchema = new Schema({
     title: String,
     description: String,
     price: Number,
-    sort: String,
+    sort: Number,
     images: [],
     releaseTime: String,
     isBuy: {type: Boolean, default: false},
+    isCheck: {type: Boolean, default: true},
 });
 
 const Product = mongoose.model('Product', productSchema);

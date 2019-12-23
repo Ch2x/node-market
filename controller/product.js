@@ -84,7 +84,7 @@ class Product extends BaseComponent {
             return;
         }
         try{
-            const products = await ProductModel.find({user_id});
+            const products = await ProductModel.find({user_id, isBuy: false}).sort({'_id': -1});
             res.send(products);
         }catch(err) {
             res.json({
@@ -96,17 +96,28 @@ class Product extends BaseComponent {
     }
 
     async getAllProducts(req, res, next) {
-        const { sort } = req.query;
-        console.log(sort);
+        const { sort, page, pageSize, sorting } = req.query;
+        let flag ={releaseTime: -1};
+        if(sorting == 1) {
+             flag = {price: 1};
+        }else if(sorting == 2) {
+            flag = {price: -1};
+        }else if(sorting == 3) {
+            flag = {releaseTime: -1};
+        }
+        const size =parseInt(pageSize);
+        const skip = (page - 1) * size;
         try{
-            var filter = { isBuy: false};
+            var filter = { isBuy: false, isCheck: true, };
             if(sort) {
+                console.log(sort);
                 filter = { 
                     sort,
                     isBuy: false, 
+                    isCheck: true,
                 };
             }
-            const products = await ProductModel.find(filter);
+            const products = await ProductModel.find(filter).skip(skip).limit(size).sort(flag);
             res.send(products);
         }catch(err) {
             res.json({
@@ -177,7 +188,11 @@ class Product extends BaseComponent {
         }
         try{
             searchValue = new RegExp(searchValue);
-            const result = await ProductModel.find({ title: searchValue });
+
+            const result = await ProductModel.find({ $or: [
+                {title: {$regex: searchValue, $options: '$i'}},
+                {description: {$regex: searchValue, $options: '$i'}}, 
+              ], isBuy: false });
             res.send(result);
         }catch(err) {
             res.json({

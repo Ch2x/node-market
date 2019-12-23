@@ -1,6 +1,8 @@
 import express from 'express';
 import Product from '../controller/product';
 import Buy from '../controller/buy';
+import Sort from '../controller/sort'
+
 
 const router = express.Router();
 
@@ -15,5 +17,7 @@ router.get('/getOrderInfo', Product.getOrderInfo);
 router.post('/confirmOrder', Buy.confirmOrder);
 router.get('/getMyBuy', Buy.getMyBuy);
 router.get('/getMySold', Buy.getMySold);
+router.get('/getBuyOrderDetail', Buy.getBuyOrderDetail);
+router.get('/getSorts', Sort.getSorts);
 
 export default router;

@@ -95,6 +95,7 @@ class Cart extends BaseComponent {
                     owner: user.userName,
                     owner_id: result.user_id,
                     cart_id: item.cart_id,
+                    isBuy: result.isBuy,
                 }
             }))
             res.send(product)

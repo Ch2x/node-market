@@ -74,7 +74,7 @@ class Comment extends BaseComponent {
             return;
         }
         try{
-            let reply = await CommentModel.find({to_uid: user_id});
+            let reply = await CommentModel.find({to_uid: user_id}).sort({"_id": -1});
             reply = await Promise.all(reply.map(async function(item) {
                 const userInfo = await UserInfoModel.findOne({user_id: item.from_uid}).select('avatar userName');
                 const productInfo = await ProductModel.findOne({product_id: item.product_id}).select('images');
@@ -102,7 +102,7 @@ class Comment extends BaseComponent {
             const productList = await ProductModel.find({user_id}).select('product_id');
             let comment = [];
             await Promise.all(productList.map(async function(item) {
-                const result = await CommentModel.find({product_id: item.product_id}).sort({"commentTime": 1});
+                const result = await CommentModel.find({product_id: item.product_id}).sort({"_id": -1});
                 if(result) {
                     comment.push(...result);
                 }
@@ -133,13 +133,18 @@ class Comment extends BaseComponent {
                     }
                 }
             }))
-            comment = comment.filter(function(item) {
+            comment = comment.filter((item) => {
                 return item;
             })
-            comment = [
-                ...reply,
-                ...comment,
-            ]
+            if(comment.length === 0) {
+                comment = [
+                    ...reply,
+                ]
+            } else {
+                comment = [
+                    ...comment,
+                ]
+            }
             res.send(comment);
         }catch(err) {
             res.json({

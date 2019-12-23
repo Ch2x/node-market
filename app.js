@@ -7,7 +7,7 @@ import configFile from 'config-lite'
 import router from './routes/index'
 import pkg from './package'
 import db from './mongodb/db.js'
-import bodyParser from 'body-parser'
+
 
 const config = configFile(__dirname)
 const app = express()
@@ -19,6 +19,7 @@ app.set('view engine', 'ejs')
 
 // 设置静态文件目录
 app.use(express.static('./public'));
+app.use(express.static('./dist'));
 
 app.all('*', (req, res, next) => {
 	res.header("Access-Control-Allow-Origin", req.headers.origin || '*');
@@ -35,6 +36,7 @@ app.all('*', (req, res, next) => {
 
 // app.use(bodyParser.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
+
 
 // session 中间件
 const MongoStore = connectMongo(session)

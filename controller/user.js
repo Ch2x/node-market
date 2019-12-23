@@ -4,6 +4,8 @@ import UserModel from '../models/user'
 import UserInfoModel from '../models/userInfo'
 import dtime from 'time-formater'
 import crypto from 'crypto'
+import nodeMailer from 'nodemailer'
+import svgCaptcha  from 'svg-captcha'
 
 class User extends BaseComponent {
     constructor() {
@@ -12,6 +14,8 @@ class User extends BaseComponent {
         this.registered = this.registered.bind(this);
         this.login = this.login.bind(this);
         this.updateAvatar = this.updateAvatar.bind(this);
+        // this.changePassword = this.changePassword.bind(this);
+        this.setPassword = this.setPassword.bind(this);
     }
     async registered(req, res, next) {
         const form = new formidable.IncomingForm();
@@ -140,7 +144,7 @@ class User extends BaseComponent {
         }
         try {
             const image_path = await this.getPath(req);
-            await UserInfoModel.findOneAndUpdate({user_id}, {$set: {avatar: image_path}});
+            await UserInfoModel.findOneAndUpdate({user_id}, {avatar: image_path});
             res.send({
                 status: 1,
                 image_path,
@@ -152,6 +156,70 @@ class User extends BaseComponent {
                 message: '上传图片失败'
             })
         }
+    }
+    //nodeMailer模块发送邮件
+    
+
+    async setPassword(req, res, next) {
+        const form = new formidable.IncomingForm();
+        form.parse(req, async (err, fields, files) => {
+            const { user_id, oldPassword, password, confirmPassword } = fields;
+            try {
+                if (!user_id) {
+                    throw new Error('用户参数错误');
+                } else if (!oldPassword) {
+                    throw new Error('必须填写旧密码');
+                } else if (!password) {
+                    throw new Error('必须填写新密码');
+                } else if (!confirmPassword) {
+                    throw new Error('必须填写确认密码');
+                }else if (password !== confirmPassword) {
+                    throw new Error('两次密码不一致');
+                }
+            } catch (err) {
+                console.log('修改密码失败', err);
+                res.send({
+                    status: 0,
+                    type: 'ERROR_SET',
+                    message: err.message,
+                })
+                return
+            }
+            const result = this.encryption(oldPassword);
+            try {
+                const user = await UserModel.findOne({ user_id });
+                if(user.password.toString() !== result.toString()) {
+                    res.send({
+                        status: 0,
+                        type: 'ERROR_PASSWORD',
+                        message: '旧密码错误',
+                    })
+                } else {
+                    const newPass = this.encryption(password);
+                    await UserModel.findOneAndUpdate({user_id}, {password: newPass});
+                    res.send({
+                        status: 1,
+                        message: '修改成功',
+                    })
+                }
+            }catch(err) {
+                res.send({
+                    status: 0,
+                    message: '修改密码失败',
+                })
+            }
+        })
+    }
+
+    async getcaptchas(req, res, next) {
+        var captcha = svgCaptcha.create();
+        req.session.captcha = captcha.text;
+        
+        res.type('svg'); // 使用ejs等模板时如果报错 res.type('html')
+        res.send({
+            status: 1,
+            data: captcha.data
+        })
     }
 
     encryption(password){
