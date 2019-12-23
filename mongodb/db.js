@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const config = require('config-lite')(__dirname);
+// const config = require('config-lite')(__dirname);
+const config = require('./../config/default.js');
 const chalk = require('chalk');
 
 mongoose.connect(config.mongodb);
