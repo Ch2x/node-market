@@ -3,7 +3,10 @@ const mongoose = require('mongoose');
 const config = require('./../config/default.js');
 const chalk = require('chalk');
 
-mongoose.connect(config.mongodb);
+mongoose.connect(config.mongodb, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
 mongoose.Promise = global.Promise;
 
 const db = mongoose.connection;
@@ -24,5 +27,8 @@ db.on('close', () => {
     console.log(
         chalk.red('数据库断开，重新连接数据库')
     );
-    mongoose.connect(config.mongodb, {server:{auto_reconnect:true}});
+    mongoose.connect(config.mongodb, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
 })
