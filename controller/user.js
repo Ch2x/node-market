@@ -5,7 +5,7 @@ import UserInfoModel from '../models/userInfo'
 import dtime from 'time-formater'
 import crypto from 'crypto'
 import nodeMailer from 'nodemailer'
-import svgCaptcha  from 'svg-captcha'
+import svgCaptcha from 'svg-captcha'
 
 class User extends BaseComponent {
     constructor() {
@@ -20,7 +20,11 @@ class User extends BaseComponent {
     async registered(req, res, next) {
         const form = new formidable.IncomingForm();
         form.parse(req, async (err, fields, files) => {
-            const { userName, password, confirmPassword } = fields;
+            const {
+                userName,
+                password,
+                confirmPassword
+            } = fields;
             try {
                 if (!userName) {
                     throw new Error('用户参数错误');
@@ -33,7 +37,7 @@ class User extends BaseComponent {
                 }
             } catch (err) {
                 console.log('注册用户失败', err);
-                res.send({
+                res.sendStatus({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err.message,
@@ -41,30 +45,41 @@ class User extends BaseComponent {
                 return
             }
             try {
-                const user = await UserModel.findOne({userName})
+                const user = await UserModel.findOne({
+                    userName
+                })
                 if (!user) {
                     const newPassword = this.encryption(password);
                     const user_id = await this.getId('user_id');
                     const registered_time = dtime().format('YYYY-MM-DD HH:mm');
-                    const newUser = {userName, password: newPassword, user_id};
-                    const newUserInfo = {userName, user_id, id: user_id, registered_time,};
+                    const newUser = {
+                        userName,
+                        password: newPassword,
+                        user_id
+                    };
+                    const newUserInfo = {
+                        userName,
+                        user_id,
+                        id: user_id,
+                        registered_time,
+                    };
                     UserModel.create(newUser);
                     const createUser = new UserInfoModel(newUserInfo);
                     const userInfo = await createUser.save();
-                    res.send({
+                    res.sendStatus({
                         status: 1,
                         message: '注册成功'
                     })
-                }else {
-                    res.send({
+                } else {
+                    res.sendStatus({
                         status: 0,
                         error: 'ERROR_USERNAME',
                         message: '用户名已存在'
                     })
                 }
             } catch (err) {
-                console.log('用户注册失败',err);
-                res.send({
+                console.log('用户注册失败', err);
+                res.sendStatus({
                     status: 0,
                     type: 'REGISTERED_USER_FAILED',
                     message: '注册失败'
@@ -75,17 +90,20 @@ class User extends BaseComponent {
 
     async login(req, res, next) {
         const form = new formidable.IncomingForm();
-        form.parse(req, async(err, fields, files) => {
-            const { userName, password } = fields;
-            try{
-                if(!userName) {
+        form.parse(req, async (err, fields, files) => {
+            const {
+                userName,
+                password
+            } = fields;
+            try {
+                if (!userName) {
                     throw new Error('用户名参数错误');
-                }else if(!password) {
+                } else if (!password) {
                     throw new Error('密码参数错误');
                 }
-            }catch(err) {
+            } catch (err) {
                 console.log('登录参数错误', err);
-                res.send({
+                res.sendStatus({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err,
@@ -93,40 +111,44 @@ class User extends BaseComponent {
                 return
             }
             const newPassword = this.encryption(password);
-            try{
-                const user = await UserModel.findOne({ userName });
-                if(!user) {
-                    res.send({
+            try {
+                const user = await UserModel.findOne({
+                    userName
+                });
+                if (!user) {
+                    res.sendStatus({
                         status: 0,
                         error: 'ERROR_USERNAME',
                         message: '用户名不存在',
                     })
-                }else if(user.password.toString() !== newPassword.toString()){
+                } else if (user.password.toString() !== newPassword.toString()) {
                     console.log('用户登录密码错误');
-                    res.send({
+                    res.sendStatus({
                         status: 0,
                         type: 'ERROR_PASSWORD',
                         message: '密码错误',
                     })
-                }else {
+                } else {
                     req.session.user_id = user.user_id;
-                    const userInfo = await UserInfoModel.findOne({user_id:user.user_id});
-                    res.send(userInfo);
+                    const userInfo = await UserInfoModel.findOne({
+                        user_id: user.user_id
+                    });
+                    res.sendStatus(userInfo);
                 }
-            }catch(err) {
+            } catch (err) {
                 console.log('用户登陆失败', err);
-				res.send({
-					status: 0,
-					type: 'SAVE_USER_FAILED',
-					message: '登陆失败',
-				})
+                res.sendStatus({
+                    status: 0,
+                    type: 'SAVE_USER_FAILED',
+                    message: '登陆失败',
+                })
             }
         })
     }
 
     async logout(req, res, next) {
         delete req.session.user_id;
-        res.send({
+        res.sendStatus({
             status: 1,
             message: '退出成功',
         })
@@ -134,8 +156,8 @@ class User extends BaseComponent {
 
     async updateAvatar(req, res, next) {
         const user_id = req.session.user_id;
-        if(!user_id) {
-            res.send({
+        if (!user_id) {
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_USERID',
                 message: 'user_id参数错误',
@@ -144,13 +166,17 @@ class User extends BaseComponent {
         }
         try {
             const image_path = await this.getPath(req);
-            await UserInfoModel.findOneAndUpdate({user_id}, {avatar: image_path});
-            res.send({
+            await UserInfoModel.findOneAndUpdate({
+                user_id
+            }, {
+                avatar: image_path
+            });
+            res.sendStatus({
                 status: 1,
                 image_path,
             })
-        }catch(err) {
-            res.send({
+        } catch (err) {
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_UPLOAD_IMG',
                 message: '上传图片失败'
@@ -158,12 +184,17 @@ class User extends BaseComponent {
         }
     }
     //nodeMailer模块发送邮件
-    
+
 
     async setPassword(req, res, next) {
         const form = new formidable.IncomingForm();
         form.parse(req, async (err, fields, files) => {
-            const { user_id, oldPassword, password, confirmPassword } = fields;
+            const {
+                user_id,
+                oldPassword,
+                password,
+                confirmPassword
+            } = fields;
             try {
                 if (!user_id) {
                     throw new Error('用户参数错误');
@@ -173,12 +204,12 @@ class User extends BaseComponent {
                     throw new Error('必须填写新密码');
                 } else if (!confirmPassword) {
                     throw new Error('必须填写确认密码');
-                }else if (password !== confirmPassword) {
+                } else if (password !== confirmPassword) {
                     throw new Error('两次密码不一致');
                 }
             } catch (err) {
                 console.log('修改密码失败', err);
-                res.send({
+                res.sendStatus({
                     status: 0,
                     type: 'ERROR_SET',
                     message: err.message,
@@ -187,23 +218,29 @@ class User extends BaseComponent {
             }
             const result = this.encryption(oldPassword);
             try {
-                const user = await UserModel.findOne({ user_id });
-                if(user.password.toString() !== result.toString()) {
-                    res.send({
+                const user = await UserModel.findOne({
+                    user_id
+                });
+                if (user.password.toString() !== result.toString()) {
+                    res.sendStatus({
                         status: 0,
                         type: 'ERROR_PASSWORD',
                         message: '旧密码错误',
                     })
                 } else {
                     const newPass = this.encryption(password);
-                    await UserModel.findOneAndUpdate({user_id}, {password: newPass});
-                    res.send({
+                    await UserModel.findOneAndUpdate({
+                        user_id
+                    }, {
+                        password: newPass
+                    });
+                    res.sendStatus({
                         status: 1,
                         message: '修改成功',
                     })
                 }
-            }catch(err) {
-                res.send({
+            } catch (err) {
+                res.sendStatus({
                     status: 0,
                     message: '修改密码失败',
                 })
@@ -214,22 +251,30 @@ class User extends BaseComponent {
     async getcaptchas(req, res, next) {
         var captcha = svgCaptcha.create();
         req.session.captcha = captcha.text;
-        
+
         res.type('svg'); // 使用ejs等模板时如果报错 res.type('html')
-        res.send({
+        res.sendStatus({
             status: 1,
             data: captcha.data
         })
     }
 
-    encryption(password){
-		const newPassword = this.Md5(this.Md5(password).substr(2, 7) + this.Md5(password));
-		return newPassword;
-	}
-	Md5(password){
-		const md5 = crypto.createHash('md5');
-		return md5.update(password).digest('base64');
-	}
+    encryption(password) {
+        const newPassword = this.Md5(this.Md5(password).substr(2, 7) + this.Md5(password));
+        return newPassword;
+    }
+    Md5(password) {
+        const md5 = crypto.createHash('md5');
+        return md5.update(password).digest('base64');
+    }
+
+    loginSucceed(ws, req) {
+        ws.send('我是服务端');
+        ws.on('message', function (msg) {
+            // 业务代码
+            console.log(msg);
+        })
+    }
 }
 
 export default new User()

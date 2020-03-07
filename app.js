@@ -1,17 +1,22 @@
 import path from 'path'
 import express from 'express'
-import session  from 'express-session'
+import session from 'express-session'
 import connectMongo from 'connect-mongo'
 import flash from 'connect-flash'
 // import configFile from 'config-lite'
 import router from './routes/index'
 import pkg from './package'
 import db from './mongodb/db.js'
+import expressWs from 'express-ws'
+
 
 
 // const config = configFile(__dirname)
 const config = require('./config/default.js')
 const app = express()
+
+// websocket
+expressWs(app);
 
 // 设置模板目录
 app.set('views', path.join(__dirname, 'views'))
@@ -23,16 +28,16 @@ app.use(express.static('./public'));
 app.use(express.static('./dist'));
 
 app.all('*', (req, res, next) => {
-	res.header("Access-Control-Allow-Origin", req.headers.origin || '*');
-	res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
-	res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-  	res.header("Access-Control-Allow-Credentials", true); //可以带cookies
-	res.header("X-Powered-By", '3.2.1')
-	if (req.method == 'OPTIONS') {
-	  	res.send(200);
-	} else {
-	    next();
-	}
+  res.header("Access-Control-Allow-Origin", req.headers.origin || '*');
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With");
+  res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Credentials", true); //可以带cookies
+  res.header("X-Powered-By", '3.2.1')
+  if (req.method == 'OPTIONS') {
+    res.sendStatus(200);
+  } else {
+    next();
+  }
 });
 
 // app.use(bodyParser.json());
@@ -47,10 +52,10 @@ app.use(session({
   resave: true, // 强制更新 session
   saveUninitialized: false, // 设置为 false，强制创建一个 session，即使用户未登录
   cookie: {
-    maxAge: config.session.maxAge// 过期时间，过期后 cookie 中的 session id 自动删除
+    maxAge: config.session.maxAge // 过期时间，过期后 cookie 中的 session id 自动删除
   },
-  store: new MongoStore({// 将 session 存储到 mongodb
-    url: config.mongodb// mongodb 地址
+  store: new MongoStore({ // 将 session 存储到 mongodb
+    url: config.mongodb // mongodb 地址
   })
 }))
 // flash 中间件，用来显示通知

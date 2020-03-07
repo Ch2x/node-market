@@ -13,12 +13,12 @@ class Management {
     async getUsersCount(req, res, next) {
         try {
             const count = await UserInfoModel.find().count();
-            res.send({
+            res.sendStatus({
                 status: 1,
                 total: count,
             });
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -33,11 +33,11 @@ class Management {
         const skip = (p - 1) * size;
         try {
             const list = await UserInfoModel.find().skip(skip).limit(size);
-            res.send(
+            res.sendStatus(
                 list
             );
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -48,12 +48,12 @@ class Management {
     async getProductsCount(req, res, next) {
         try {
             const count = await ProductModel.find().count();
-            res.send({
+            res.sendStatus({
                 status: 1,
                 total: count,
             });
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -68,11 +68,11 @@ class Management {
         const skip = (p - 1) * size;
         try {
             const list = await ProductModel.find().skip(skip).limit(size).sort({'_id': -1});
-            res.send(
+            res.sendStatus(
                 list
             );
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -101,12 +101,12 @@ class Management {
                 console.log(false);
                 await ProductModel.findOneAndUpdate({product_id},{isCheck: true});
             }
-            res.send({
+            res.sendStatus({
                 status: 1,
                 type: 'SUCCESS',
             })
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'FAIL_CHANGE',
                 message: err.message,
@@ -118,12 +118,12 @@ class Management {
     async getCommentCount(req, res, next) {
         try {
             const count = await CommentModel.find().count();
-            res.send({
+            res.sendStatus({
                 status: 1,
                 total: count,
             });
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -138,11 +138,11 @@ class Management {
         const skip = (p - 1) * size;
         try {
             const list = await CommentModel.find().skip(skip).limit(size).sort({'_id': -1});
-            res.send(
+            res.sendStatus(
                 list
             );
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -153,7 +153,7 @@ class Management {
     async delComments(req, res, next) {
         const { comment_id } = req.params;
         if(!comment_id) {
-            res.send({
+            res.sendStatus({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -161,12 +161,12 @@ class Management {
         }
         try {
             await CommentModel.findOneAndRemove({comment_id});
-            res.send({
+            res.sendStatus({
                 status: 1,
                 success: '删除评论成功',
             })
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_DELETE',
                 message: err.message,
@@ -177,12 +177,12 @@ class Management {
     async getOrdersCount(req, res, next) {
         try {
             const count = await BuyModel.find().count();
-            res.send({
+            res.sendStatus({
                 status: 1,
                 total: count,
             });
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -197,11 +197,11 @@ class Management {
         const skip = (p - 1) * size;
         try {
             const list = await UserInfoModel.find().skip(skip).limit(size);
-            res.send(
+            res.sendStatus(
                 list
             );
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,

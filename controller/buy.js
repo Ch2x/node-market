@@ -19,7 +19,7 @@ class Buy extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if (err) {
                 console.log('formidable解析出错', err);
-                res.send({
+                res.sendStatus({
                     status: 1,
                     message: '更改失败',
                 });
@@ -36,7 +36,7 @@ class Buy extends BaseComponent {
                 }
             } catch (err) {
                 console.log('提交订单参数错误');
-                res.send({
+                res.sendStatus({
                     status: 0,
                     type: 'ERROR_POST',
                     message: err,
@@ -52,7 +52,7 @@ class Buy extends BaseComponent {
                 await CartModel.remove({user_id, product_id});
                 const productInfo = await ProductModel.findOne({product_id}).select('user_id');
                 const userInfo = await UserInfoModel.findOne({user_id: productInfo.user_id}).select('userName');
-                res.send({
+                res.sendStatus({
                     status: 1,
                     type: 'SUCCESS',
                     message: {
@@ -63,7 +63,7 @@ class Buy extends BaseComponent {
                 })
             }catch (err) {
                 console.log('提交失败', err);
-                res.send({
+                res.sendStatus({
                     status: 0,
                     type: 'FAIL_RELEASE',
                     message: '提交失败',
@@ -76,7 +76,7 @@ class Buy extends BaseComponent {
     async getMyBuy(req, res, next) {
         const { user_id } = req.query;
         if(!user_id) {
-            res.send({
+            res.sendStatus({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -89,7 +89,7 @@ class Buy extends BaseComponent {
                 arr.push(goods[i].product_id)
             }
             const products = await ProductModel.find({product_id: {$in: arr}}).sort({'_id': -1});
-            res.send(products);
+            res.sendStatus(products);
         }catch(err) {
             res.json({
                 status: 0,
@@ -102,7 +102,7 @@ class Buy extends BaseComponent {
     async getMySold(req, res, next) {
         const { user_id } = req.query;
         if(!user_id) {
-            res.send({
+            res.sendStatus({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -110,7 +110,7 @@ class Buy extends BaseComponent {
         }
         try{
             const products = await ProductModel.find({user_id, isBuy: true}).sort({'_id': -1});
-            res.send(products);
+            res.sendStatus(products);
         }catch(err) {
             res.json({
                 status: 0,
@@ -123,7 +123,7 @@ class Buy extends BaseComponent {
     async getBuyOrderDetail(req, res, next) {
         const { product_id, user_id } = req.query;
         if(!product_id || !user_id) {
-            res.send({
+            res.sendStatus({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -134,7 +134,7 @@ class Buy extends BaseComponent {
             const product = await ProductModel.findOne({product_id});
             const address = await AddressModel.findOne({address_id: buy.address_id});
             const userInfo = await UserInfoModel.findOne({user_id: product.user_id});
-            res.send({
+            res.sendStatus({
                 title: product.title,
                 image: product.images[0],
                 address: address.address,
@@ -146,7 +146,7 @@ class Buy extends BaseComponent {
                 price: product.price,
             })
         }catch(err) {
-            res.send({
+            res.sendStatus({
                 status: 0,
                 type: 'ERROR_get',
                 message: err.message,
