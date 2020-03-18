@@ -17,7 +17,7 @@ class Comment extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if(err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '发布失败',
                 });
@@ -30,7 +30,7 @@ class Comment extends BaseComponent {
                 }
             } catch(err) {
                 console.log('评论参数错误');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_POST',
                     message: err,
@@ -42,14 +42,14 @@ class Comment extends BaseComponent {
                 const commentTime = dtime().format('YYYY-MM-DD HH:mm');
                 const newComment = { product_id, content, from_uid, to_uid, comment_id, commentTime };
                 await CommentModel.create(newComment);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     type: 'SUCCESS',
                     message: '评论成功',
                 });
             } catch(err) {
                 console.log('评论失败');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'FAIL_COMMENT',
                     message: '评论失败',
@@ -145,7 +145,7 @@ class Comment extends BaseComponent {
                     ...comment,
                 ]
             }
-            res.sendStatus(comment);
+            res.send(comment);
         }catch(err) {
             res.json({
                 status: 0,

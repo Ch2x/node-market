@@ -37,7 +37,7 @@ class User extends BaseComponent {
                 }
             } catch (err) {
                 console.log('注册用户失败', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err.message,
@@ -66,12 +66,12 @@ class User extends BaseComponent {
                     UserModel.create(newUser);
                     const createUser = new UserInfoModel(newUserInfo);
                     const userInfo = await createUser.save();
-                    res.sendStatus({
+                    res.send({
                         status: 1,
                         message: '注册成功'
                     })
                 } else {
-                    res.sendStatus({
+                    res.send({
                         status: 0,
                         error: 'ERROR_USERNAME',
                         message: '用户名已存在'
@@ -79,7 +79,7 @@ class User extends BaseComponent {
                 }
             } catch (err) {
                 console.log('用户注册失败', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'REGISTERED_USER_FAILED',
                     message: '注册失败'
@@ -103,7 +103,7 @@ class User extends BaseComponent {
                 }
             } catch (err) {
                 console.log('登录参数错误', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err,
@@ -116,14 +116,14 @@ class User extends BaseComponent {
                     userName
                 });
                 if (!user) {
-                    res.sendStatus({
+                    res.send({
                         status: 0,
                         error: 'ERROR_USERNAME',
                         message: '用户名不存在',
                     })
                 } else if (user.password.toString() !== newPassword.toString()) {
                     console.log('用户登录密码错误');
-                    res.sendStatus({
+                    res.send({
                         status: 0,
                         type: 'ERROR_PASSWORD',
                         message: '密码错误',
@@ -133,11 +133,11 @@ class User extends BaseComponent {
                     const userInfo = await UserInfoModel.findOne({
                         user_id: user.user_id
                     });
-                    res.sendStatus(userInfo);
+                    res.send(userInfo);
                 }
             } catch (err) {
-                console.log('用户登陆失败', err);
-                res.sendStatus({
+                console.log('用户登陆失败', res.send);
+                res.send({
                     status: 0,
                     type: 'SAVE_USER_FAILED',
                     message: '登陆失败',
@@ -148,7 +148,7 @@ class User extends BaseComponent {
 
     async logout(req, res, next) {
         delete req.session.user_id;
-        res.sendStatus({
+        res.send({
             status: 1,
             message: '退出成功',
         })
@@ -157,7 +157,7 @@ class User extends BaseComponent {
     async updateAvatar(req, res, next) {
         const user_id = req.session.user_id;
         if (!user_id) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_USERID',
                 message: 'user_id参数错误',
@@ -171,12 +171,12 @@ class User extends BaseComponent {
             }, {
                 avatar: image_path
             });
-            res.sendStatus({
+            res.send({
                 status: 1,
                 image_path,
             })
         } catch (err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_UPLOAD_IMG',
                 message: '上传图片失败'
@@ -209,7 +209,7 @@ class User extends BaseComponent {
                 }
             } catch (err) {
                 console.log('修改密码失败', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_SET',
                     message: err.message,
@@ -222,7 +222,7 @@ class User extends BaseComponent {
                     user_id
                 });
                 if (user.password.toString() !== result.toString()) {
-                    res.sendStatus({
+                    res.send({
                         status: 0,
                         type: 'ERROR_PASSWORD',
                         message: '旧密码错误',
@@ -234,13 +234,13 @@ class User extends BaseComponent {
                     }, {
                         password: newPass
                     });
-                    res.sendStatus({
+                    res.send({
                         status: 1,
                         message: '修改成功',
                     })
                 }
             } catch (err) {
-                res.sendStatus({
+                res.send({
                     status: 0,
                     message: '修改密码失败',
                 })
@@ -253,7 +253,7 @@ class User extends BaseComponent {
         req.session.captcha = captcha.text;
 
         res.type('svg'); // 使用ejs等模板时如果报错 res.type('html')
-        res.sendStatus({
+        res.send({
             status: 1,
             data: captcha.data
         })

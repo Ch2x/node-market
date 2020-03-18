@@ -20,7 +20,7 @@ class Product extends BaseComponent {
         form.parse(req, async (err, fields, files) => {
             if (err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '发布失败',
                 });
@@ -39,7 +39,7 @@ class Product extends BaseComponent {
                 }
             } catch (err) {
                 console.log('发布产品参数错误');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err,
@@ -51,14 +51,14 @@ class Product extends BaseComponent {
                 const releaseTime = dtime().format('YYYY-MM-DD HH:mm');
                 const newProduct = { product_id, user_id, images, releaseTime, sort, description, title, price, };
                 await ProductModel.create(newProduct);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     type: 'SUCCESS',
                     message: '发布商品成功',
                 })
             } catch (err) {
                 console.log('发布失败', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'FAIL_RELEASE',
                     message: '发布失败',
@@ -85,7 +85,7 @@ class Product extends BaseComponent {
         }
         try{
             const products = await ProductModel.find({user_id, isBuy: false}).sort({'_id': -1});
-            res.sendStatus(products);
+            res.send(products);
         }catch(err) {
             res.json({
                 status: 0,
@@ -118,7 +118,7 @@ class Product extends BaseComponent {
                 };
             }
             const products = await ProductModel.find(filter).skip(skip).limit(size).sort(flag);
-            res.sendStatus(products);
+            res.send(products);
         }catch(err) {
             res.json({
                 status: 0,
@@ -159,7 +159,7 @@ class Product extends BaseComponent {
             );
             const user_id = product.user_id;
             const userInfo = await UserInfoModel.findOne({user_id});
-            res.sendStatus({
+            res.send({
                 product,
                 userInfo,
                 comment,
@@ -193,7 +193,7 @@ class Product extends BaseComponent {
                 {title: {$regex: searchValue, $options: '$i'}},
                 {description: {$regex: searchValue, $options: '$i'}}, 
               ], isBuy: false });
-            res.sendStatus(result);
+            res.send(result);
         }catch(err) {
             res.json({
                 status: 0,
@@ -207,7 +207,7 @@ class Product extends BaseComponent {
         const { user_id, product_id } = req.params;
         console.log(req.params);
         if(!user_id || !product_id) {
-            res.sendStatus({
+            res.send({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -215,12 +215,12 @@ class Product extends BaseComponent {
         }
         try {
             await ProductModel.findOneAndRemove({product_id});
-            res.sendStatus({
+            res.send({
                 status: 1,
                 success: '删除产品成功',
             });
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_DELETE',
                 message: err.message,
@@ -234,7 +234,7 @@ class Product extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if (err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '更改失败',
                 });
@@ -253,7 +253,7 @@ class Product extends BaseComponent {
                 }
             } catch (err) {
                 console.log('发布产品参数错误');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_QUERY',
                     message: err,
@@ -262,12 +262,12 @@ class Product extends BaseComponent {
             }
             try {
                 await ProductModel.findOneAndUpdate({product_id}, {images, sort, description, title, price});
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: 'OK',
                 })
             }catch(err) {
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: "ERROR_UPDATE",
                     message: err.message,
@@ -279,7 +279,7 @@ class Product extends BaseComponent {
     async getOrderInfo(req, res, next) {
         const { user_id, product_id } = req.query;
         if(!user_id || !product_id) {
-            res.sendStatus({
+            res.send({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -288,12 +288,12 @@ class Product extends BaseComponent {
         try {
             const address = await AddressModel.findOne({user_id});
             const product = await ProductModel.findOne({product_id});
-            res.sendStatus({
+            res.send({
                 address,
                 product,
             })
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 ttype: 'ERROR_GET',
                 message: err.message,

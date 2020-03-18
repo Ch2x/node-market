@@ -18,7 +18,7 @@ class Cart extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if(err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '解析出错',
                 });
@@ -29,12 +29,12 @@ class Cart extends BaseComponent {
                 const cart_id = await this.getId('cart_id');
                 const newCart = { user_id, product_id, cart_id };
                 await CartModel.create(newCart);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '添加购物车成功'
                 })
             }catch(err) {
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'FAIL_ADD',
                     message: err.message,
@@ -47,7 +47,7 @@ class Cart extends BaseComponent {
         let { products, user_id } = req.params;
         products = products.split(',')
         if( !products || !user_id) {
-            res.sendStatus({
+            res.send({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -55,12 +55,12 @@ class Cart extends BaseComponent {
         }
         try {
             await CartModel.remove({cart_id: {$in: products}});
-            res.sendStatus({
+            res.send({
                 status: 1,
                 success: '删除成功'
             })
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_DELETE',
                 message: err.message,
@@ -98,7 +98,7 @@ class Cart extends BaseComponent {
                     isBuy: result.isBuy,
                 }
             }))
-            res.sendStatus(product)
+            res.send(product)
         }catch(err) {
             res.json({
                 status: 0,
@@ -112,12 +112,12 @@ class Cart extends BaseComponent {
         const { user_id, product_id } = req.params;
         const result = await CartModel.findOne({user_id, product_id});
         if(result) {
-            res.sendStatus({
+            res.send({
                 status: 1,
                 message: '已被添加'
             })
         } else {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 message: '未被添加'
             })

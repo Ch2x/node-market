@@ -12,7 +12,7 @@ class Sort extends BaseComponent {
         const { sortName } = req.query;
         if(!sortName) {
             console.log('添加失败', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '添加失败',
                 });
@@ -22,14 +22,14 @@ class Sort extends BaseComponent {
             const sort_id = await this.getId('sort_id');
             const newSort = { sort_id, sortName };
             await SortModel.create(newSort);
-            res.sendStatus({
+            res.send({
                 status: 1,
                 type: 'SUCCESS',
                 message: '添加成功',
             })
         }catch (err) {
             console.log('添加', err);
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'FAIL_ADD',
                 message: '添加失败',
@@ -41,12 +41,12 @@ class Sort extends BaseComponent {
     async getSortCount(req, res, next) {
         try {
             const count = await SortModel.find().count();
-            res.sendStatus({
+            res.send({
                 status: 1,
                 total: count,
             });
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -61,11 +61,11 @@ class Sort extends BaseComponent {
         const skip = (p - 1) * size;
         try {
             const list = await SortModel.find().skip(skip).limit(size);
-            res.sendStatus(
+            res.send(
                 list
             );
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -76,9 +76,9 @@ class Sort extends BaseComponent {
     async getSorts(req, res, next) {
         try {
             const list = await SortModel.find();
-            res.sendStatus(list);
+            res.send(list);
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 type: 'ERROR_GET',
                 message: err.message,
@@ -91,7 +91,7 @@ class Sort extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if (err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '修改失败',
                 });
@@ -106,7 +106,7 @@ class Sort extends BaseComponent {
                 }
             } catch (err) {
                 console.log('分类参数错误');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_EDIT',
                     message: err.message,
@@ -115,12 +115,12 @@ class Sort extends BaseComponent {
             }
             try {
                 await SortModel.findOneAndUpdate({sort_id}, {sortName});
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: 'OK',
                 })
             }catch(err) {
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: "ERROR_EDIT",
                     message: err.message,

@@ -14,7 +14,7 @@ class Address extends BaseComponent {
         form.parse(req, async(err, fields, files) => {
             if(err) {
                 console.log('formidable解析出错', err);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     message: '解析出错',
                 });
@@ -33,7 +33,7 @@ class Address extends BaseComponent {
                 }
             } catch (err) {
                 console.log('增加地址参数错误');
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'ERROR_POST',
                     message: err,
@@ -44,14 +44,14 @@ class Address extends BaseComponent {
                 const address_id = await this.getId('address_id');
                 const newAddress = { address, phone, user_id, name, postCode, address_id };
                 await AddressModel.create(newAddress);
-                res.sendStatus({
+                res.send({
                     status: 1,
                     type: 'SUCCESS',
                     message: '地址添加成功',
                 })
             }catch (err) {
                 console.log('添加失败', err);
-                res.sendStatus({
+                res.send({
                     status: 0,
                     type: 'FAIL_ADD',
                     message: err.message,
@@ -78,7 +78,7 @@ class Address extends BaseComponent {
         }
         try{
             const addresses = await AddressModel.find({user_id});
-            res.sendStatus(addresses);
+            res.send(addresses);
         }catch(err) {
             res.json({
                 status: 0,
@@ -91,7 +91,7 @@ class Address extends BaseComponent {
     async delAddress(req, res, next) {
         const { user_id, address_id } = req.params;
         if(!user_id || !address_id) {
-            res.sendStatus({
+            res.send({
                 type: 'ERROR_QUERY',
                 message: '参数错误',
             })
@@ -99,12 +99,12 @@ class Address extends BaseComponent {
         }
         try {
             await AddressModel.remove({address_id});
-            res.sendStatus({
+            res.send({
                 status: 1,
                 success: '删除成功',
             });
         }catch(err) {
-            res.sendStatus({
+            res.send({
                 status: 0,
                 ttype: 'ERROR_DELETE',
                 message: err.message,
