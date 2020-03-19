@@ -29,25 +29,25 @@ app.use(express.static('./public'));
 app.use(express.static('./dist'));
 
 // 第 2 步：获得一个createBundleRenderer
-const {
-  createBundleRenderer
-} = require("vue-server-renderer");
-const bundle = require("./dist/vue-ssr-server-bundle.json");
-const clientManifest = require("./dist/vue-ssr-client-manifest.json");
+// const {
+//   createBundleRenderer
+// } = require("vue-server-renderer");
+// const bundle = require("./dist/vue-ssr-server-bundle.json");
+// const clientManifest = require("./dist/vue-ssr-client-manifest.json");
 
-const renderer = createBundleRenderer(bundle, {
-  runInNewContext: false,
-  template: fs.readFileSync(path.join(__dirname, "./public/index.template.html"), "utf-8"),
-  clientManifest,
-});
+// const renderer = createBundleRenderer(bundle, {
+//   runInNewContext: false,
+//   template: fs.readFileSync(path.join(__dirname, "./public/index.template.html"), "utf-8"),
+//   clientManifest,
+// });
 
-function renderToString(context) {
-  return new Promise((resolve, reject) => {
-    renderer.renderToString(context, (err, html) => {
-      err ? reject(err) : resolve(html);
-    });
-  });
-}
+// function renderToString(context) {
+//   return new Promise((resolve, reject) => {
+//     renderer.renderToString(context, (err, html) => {
+//       err ? reject(err) : resolve(html);
+//     });
+//   });
+// }
 
 
 app.all('*', (req, res, next) => {
@@ -87,17 +87,17 @@ app.use(flash())
 // 路由
 router(app)
 
-app.get('*', async(req, res) => {
-  const context = {
-    title: "ssr test",
-    url: req.url
-  };
-  console.log(context)
-  // 这里无需传入一个应用程序，因为在执行 bundle 时已经自动创建过。
-  // 现在我们的服务器与应用程序已经解耦！
-  const html = await renderToString(context);
-  res.end(html)
-})
+// app.get('*', async(req, res) => {
+//   const context = {
+//     title: "ssr test",
+//     url: req.url
+//   };
+//   console.log(context)
+//   // 这里无需传入一个应用程序，因为在执行 bundle 时已经自动创建过。
+//   // 现在我们的服务器与应用程序已经解耦！
+//   const html = await renderToString(context);
+//   res.end(html)
+// })
 
 // 监听端口，启动程序
 app.listen(config.port, function () {
