@@ -1,4 +1,8 @@
 {
-    "presets": ["stage-3", "es2015"],
-    "plugins": ["transform-runtime"]
+    "presets": [
+        "env"
+    ],
+    "plugins": [
+        "transform-runtime"
+    ]
 }

@@ -13,7 +13,7 @@ import fs from 'fs';
 
 
 // const config = configFile(__dirname)
-const config = require('./config/default.js')
+const config = require('./config/default.js') 
 const app = express()
 
 // websocket
